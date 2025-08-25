@@ -59,6 +59,11 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas");
         }
 
+        if (!user.isActive())
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario inativo");
+        }
+
         String newUuid = UUID.randomUUID().toString();
         user.setUuid(newUuid);
 
@@ -69,5 +74,24 @@ public class UserService {
         repo.save(user);
 
         return user;
+    }
+
+    public boolean isUuidValid(String uuid) {
+        try {
+            User user = repo.findByUuid(uuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login expirado"));
+
+            long expireAt = Long.parseLong(user.getUuidExpire());
+
+            if (expireAt < System.currentTimeMillis())
+            {
+                throw (new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login expirado"));
+            }
+
+            return true; // ainda não expirou
+
+        } catch (NumberFormatException e) {
+            throw (new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Dados inválidos")); // dado inválido
+        }
     }
 }

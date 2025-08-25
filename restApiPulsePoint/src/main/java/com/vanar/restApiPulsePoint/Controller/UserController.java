@@ -29,7 +29,10 @@ public class UserController {
 
     // GET /users/{id} -> busca por id
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
+    public User getById(@PathVariable Long id, @RequestHeader String uuid) {
+
+        service.isUuidValid(uuid);
+
         return service.getById(id);
     }
 
@@ -44,10 +47,4 @@ public class UserController {
                 .body(created);
     }
 
-    // POST /users -> Retorna usuario logado
-    @PostMapping("/login")
-    public ResponseEntity<User> login(@Valid @RequestBody LoginRequest request) {
-        User user = service.authenticate(request);
-        return ResponseEntity.ok(user);
-    }
 }
