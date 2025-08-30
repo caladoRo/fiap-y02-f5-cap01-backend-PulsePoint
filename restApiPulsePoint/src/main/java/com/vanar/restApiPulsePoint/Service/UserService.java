@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -51,6 +53,35 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 
+    public User getByUuid(String uuid) {
+        return repo.findByUuid(uuid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+    }
+
+    public boolean updateUser(String uuid, UserRequest updateDTO) {
+        Optional<User> optionalUser = repo.findByUuid(uuid);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            if (updateDTO.getName() != null) user.setName(updateDTO.getName());
+            if (updateDTO.getEmail() != null) user.setEmail(updateDTO.getEmail());
+            if (updateDTO.getPassword() != null) user.setPassword(updateDTO.getPassword());
+            if (updateDTO.getRole() != null) user.setRole(updateDTO.getRole());
+
+            repo.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteUser(Long id) {
+        if (repo.existsById(id)) {
+            repo.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
     public User authenticate(LoginRequest loginRequest) {
         User user = repo.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas"));
@@ -88,10 +119,28 @@ public class UserService {
                 throw (new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login expirado"));
             }
 
-            return true; // ainda não expirou
+            return true;
 
         } catch (NumberFormatException e) {
             throw (new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Dados inválidos")); // dado inválido
+        }
+    }
+
+    public void isAdmin(String uuid) {
+        try {
+            User user = repo.findByUuid(uuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada"));
+
+            long expireAt = Long.parseLong(user.getUuidExpire());
+            String role = user.getRole();
+
+            if (!Objects.equals(role,"admin"))
+            {
+                throw (new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada"));
+            }
+
+        } catch (NumberFormatException e) {
+            throw (new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permissão negada")); // dado inválido
         }
     }
 }
