@@ -8,10 +8,11 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "User")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class User {
 
@@ -50,8 +51,8 @@ public class User {
 
     // Deixar o Hibernate preencher na criação (ou o default do banco)
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", updatable = false, columnDefinition = "DATETIME")
+    private Timestamp createdAt;
 
     // tinyint(1) ↔ boolean
     @Column(columnDefinition = "TINYINT(1)")
