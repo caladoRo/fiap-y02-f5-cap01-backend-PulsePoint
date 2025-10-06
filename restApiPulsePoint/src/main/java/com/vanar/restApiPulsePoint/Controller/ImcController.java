@@ -1,23 +1,52 @@
 package com.vanar.restApiPulsePoint.Controller;
 
-import com.vanar.restApiPulsePoint.Model.DadosForms;
+import com.vanar.restApiPulsePoint.DTO.ImcResponse;
+import com.vanar.restApiPulsePoint.DTO.UserRequest;
+import com.vanar.restApiPulsePoint.Model.User;
 import com.vanar.restApiPulsePoint.Service.ImcService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import com.vanar.restApiPulsePoint.Service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/imc")
 public class ImcController {
 
     private ImcService imcService;
+    private UserService service;
 
-    @PostMapping
-    public Map<String, Object> calcular(@RequestBody DadosForms dados) throws Exception {
-        return imcService.processIMC(dados.getWeight(), dados.getHeight());
+    public ImcController(UserService service) {
+        this.service = service;
+    }
+
+    @PutMapping
+    public ResponseEntity<Object> calculate(@RequestHeader String uuid,
+                                 @RequestBody UserRequest updateDTO)
+    {
+        // Valida UUID
+        User loggedUser = service.getByUuid(uuid);
+        if (loggedUser == null) {
+            return ResponseEntity.status(401).body("Token inválido ou expirado");
+        }
+
+        try {
+            ImcResponse resultado = imcService.processIMC(updateDTO.getWeight(), updateDTO.getHeight());
+
+            updateDTO.setImc(resultado.getImc());
+            updateDTO.setImc_desc(resultado.getImc_desc());
+
+            boolean updated = service.updateUser(uuid, updateDTO);
+            if (!updated) {
+                return ResponseEntity.status(404).body("Usuário não encontrado");
+            }
+
+            return ResponseEntity.ok(resultado);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao calcular IMC: " + e.getMessage());
+        }
     }
 }

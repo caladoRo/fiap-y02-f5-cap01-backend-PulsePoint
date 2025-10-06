@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "User")
+@Table(name = "Users")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class User {
 
@@ -48,6 +48,25 @@ public class User {
             message = "role deve ser admin, paciente ou medico")
     @Column(nullable = false, length = 50)
     private String role;
+
+    @NotBlank
+    @Column(nullable = true)
+    private Integer age;
+
+    @Column(nullable = true)
+    private float weight;
+
+    @Column(nullable = true)
+    private float height;
+
+    @Column(nullable = true)
+    private String bloodType;
+
+    @Column(nullable = true)
+    private float imc;
+
+    @Column(nullable = true)
+    private String imc_desc;
 
     // Deixar o Hibernate preencher na criação (ou o default do banco)
     @CreationTimestamp

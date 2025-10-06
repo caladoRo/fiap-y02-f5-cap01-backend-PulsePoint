@@ -1,39 +1,19 @@
 package com.vanar.restApiPulsePoint.DTO;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class UserRequest {
-
-    @NotBlank
-    private String name;
+@Getter @Setter
+public class ImcResponse {
 
     @NotBlank
     @Email
-    private String email;
-
-    @NotBlank
-    private String password;
-
-    @NotBlank
-    private String role;
-
-    @NotBlank
-    private Integer age;
-
-    @NotBlank
     private float weight;
 
     @NotBlank
     private float height;
-
-    @NotBlank
-    private float bloodType;
 
     @NotBlank
     private float imc;
