@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'   # ou 21, se for sua versão
+          java-version: '21'   # ou 21, se for sua versão
 
       - name: 🧹 Limpar e compilar o projeto
         run: mvn clean compile
