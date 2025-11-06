@@ -1,0 +1,41 @@
+name: CI/CD Pipeline - Java + Railway
+
+on:
+  push:
+    branches: [ main ]   # dispara quando fizer push na branch main
+  pull_request:
+    branches: [ main ]   # dispara quando abrir PR para a main
+
+jobs:
+  build:
+    name: 🧱 Build e Testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔍 Clonar o código
+        uses: actions/checkout@v4
+
+      - name: ☕ Configurar o Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'   # ou 21, se for sua versão
+
+      - name: 🧹 Limpar e compilar o projeto
+        run: mvn clean compile
+
+      - name: 🧪 Executar testes
+        run: mvn test
+
+      - name: 📦 Empacotar aplicação
+        run: mvn package -DskipTests
+
+  deploy:
+    name: 🚀 Deploy no Railway
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Disparar deploy no Railway
+        run: |
+          curl -X POST "$RAILWAY_DEPLOY_HOOK"
