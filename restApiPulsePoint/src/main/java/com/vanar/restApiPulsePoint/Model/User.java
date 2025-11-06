@@ -49,7 +49,6 @@ public class User {
     @Column(nullable = false, length = 50)
     private String role;
 
-    @NotBlank
     @Column(nullable = true)
     private Integer age;
 

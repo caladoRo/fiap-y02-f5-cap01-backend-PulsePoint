@@ -23,21 +23,21 @@ public class UserRequest {
     @NotBlank
     private String role;
 
-    @NotBlank
+
     private Integer age;
 
-    @NotBlank
+
     private float weight;
 
-    @NotBlank
+
     private float height;
 
-    @NotBlank
-    private float bloodType;
 
-    @NotBlank
+    private String bloodType;
+
+
     private float imc;
 
-    @NotBlank
+
     private String imc_desc;
 }
